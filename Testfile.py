@@ -1,3 +1,4 @@
+# File in which we test stuff
 
 # MITM ARP spoofing attack - using Scapy
 
@@ -30,11 +31,20 @@ def arppoison():
 
     # The MAC and IP addresses of the victims and the attacker are obtained
     # victims must be separated into two groups, servers and hosts
-    for i in range(nrOfHosts): 
-        macVictimList.append(raw_input("The MAC address of the " + str(i+1) + "th victim:"))
-        ipVictimList.append(raw_input("The IP address of the " + str(i+1) + "th victim:"))
-    macAttacker = raw_input("The MAC address of the attacker: ")
+    #for i in range(nrOfHosts): 
+
+    # Victim 1
+    macVictimList.append("08:00:27:B7:C4:AF")
+    ipVictimList.append("192.168.56.101")
+
+    # Victim 2
+    macVictimList.append("08:00:27:CC:08:6F")
+    ipVictimList.append("192.168.56.102")
+
+    # The attacker
+    macAttacker = "08:00:27:D0:25:4B"
     # ipAttacker = input("The IP address of the attacker: ")
+
 
     #for (i in nrOfHosts):
     #    arp
@@ -91,4 +101,3 @@ def forward_packet(packet, macVictimList, ipVictimList, macAttacker):
             break
 
 main()
-

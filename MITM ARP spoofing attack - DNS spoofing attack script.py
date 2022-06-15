@@ -95,19 +95,14 @@ def forward_packet(packet, macVictimList, ipVictimList, macAttacker):
             # If a match has been found we break out of the loop as only one match can be found
             break
 
-# To Do before you are able to run this method succesfully
+# To Do: before you are able to run this method succesfully
 #
 # In terminal:
-# From: https://github.com/oremanj/python-netfilterqueue/issues/67
+#   wget -c https://bootstrap.pypa.io/pip/2.7/get-pip.py
+#   python get-pip.py
+#   sudo apt update && sudo apt install python-dev build-essential libnetfilter-queue-dev
+#   pip install netfilterqueue==0.9.0
 
-# apt-get install build-essential python-dev libnetfilter-queue-dev
-# git clone git@github.com:kti/python-netfilterqueue.git
-# cd python-netfilterqueue
-# sudo apt-get install python3-dev
-# sudo python3 setup.py install
-
-# pip3 install scapy
-# pip3 install netfilterqueue 
 def dns_spoof():
     # The user needs to input the ipVictim
     ipVictim = raw_input("The IP address of the victim: ")

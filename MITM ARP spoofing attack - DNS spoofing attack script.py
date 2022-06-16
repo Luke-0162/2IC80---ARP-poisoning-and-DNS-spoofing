@@ -10,13 +10,13 @@ import logging as log
 from scapy.all import IP, DNSRR, DNS, UDP, DNSQR
 
 # In enp0s9
-# MAC Address M1: 08:00:27:B7:C4:AF - 08:00:27:76:14:01
+# MAC Address M1: 08:00:27:76:14:01
 # IP Address M1: 10.0.2.5
 
 # MAC Address Gateway: 52:54:00:12:35:00 
 # IP Address Gateway: 10.0.2.1
 
-# MAC Address Attacker (M3): 08:00:27:D0:25:4B - 08:00:27:e6:97:2f
+# MAC Address Attacker (M3): 08:00:27:e6:97:2f
 # IP Address Attacker (M3): 10.0.2.4
 
 # The main method to be ran by the user of our script

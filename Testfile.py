@@ -7,26 +7,14 @@ import os
 import logging as log
 from scapy.all import IP, DNSRR, DNS, UDP, DNSQR
 
-# Victim 1
-macVictimList.append("08:00:27:B7:C4:AF")
-ipVictimList.append("10.0.2.5")
-
-# Victim 2
-macVictimList.append("52:54:00:12:35:00")
-ipVictimList.append("10.0.2.1")
-
-# The attacker
-macAttacker = "08:00:27:D0:25:4B"
-# ipAttacker = input("The IP address of the attacker: ")
-
 # In enp0s9
-# MAC Address M1: 08:00:27:B7:C4:AF
+# MAC Address M1: 08:00:27:B7:C4:AF - 08:00:27:76:14:01
 # IP Address M1: 10.0.2.5
 
-# MAC Address Gateway: 52:54:00:12:35:00
+# MAC Address Gateway: 52:54:00:12:35:00 
 # IP Address Gateway: 10.0.2.1
 
-# MAC Address Attacker (M3): 08:00:27:D0:25:4B
+# MAC Address Attacker (M3): 08:00:27:D0:25:4B - 08:00:27:e6:97:2f
 # IP Address Attacker (M3): 10.0.2.4
 
 # The main method to be ran by the user of our script
@@ -53,15 +41,17 @@ def arp_poison():
     macVictimList = []
     ipVictimList = []
 
-    # The MAC and IP addresses of the victims and the attacker are obtained
-    # victims must be separated into two groups, servers and hosts
-    for i in range(nrOfHosts): 
-        # Note: i + 1 is printed to the user of the software
-        macVictimList.append(raw_input("The MAC address of the " + str(i+1) + "th victim:"))
-        ipVictimList.append(raw_input("The IP address of the " + str(i+1) + "th victim:"))
-    macAttacker = raw_input("The MAC address of the attacker: ")
-    # ipAttacker = input("The IP address of the attacker: ")
+    # Victim 1
+    macVictimList.append("08:00:27:76:14:01")
+    ipVictimList.append("10.0.2.5")
 
+    # Victim 2
+    macVictimList.append("52:54:00:12:35:00")
+    ipVictimList.append("10.0.2.1")
+
+    # The attacker
+    macAttacker = "08:00:27:e6:97:2f"
+    # ipAttacker = input("The IP address of the attacker: ")
     
     if (nrOfHosts == 2):
         # Send ARP package to victim 1 of spoofed IP victim 2

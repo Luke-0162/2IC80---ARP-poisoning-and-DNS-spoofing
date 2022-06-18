@@ -17,17 +17,7 @@ import os
 import logging as log
 import threading
 
-# In enp0s9
-# MAC Address M1: 08:00:27:76:14:01
-# IP Address M1: 10.0.2.5
-
-# MAC Address Gateway: 52:54:00:12:35:00 
-# IP Address Gateway: 10.0.2.1
-
-# MAC Address Attacker (M3): 08:00:27:e6:97:2f
-# IP Address Attacker (M3): 10.0.2.4
-
-# The main method to be ran by the user of our script.
+# The main method containing both the arp_poison() method and the dns_spoof() method.
 def main():
     typeOfAttack = int(input("Choose your attack. \nType 1 for a MITM ARP poisoning attack.\nType 2 for a DNS spoofing attack.\nType of attack: "))
     if (typeOfAttack == 1):

